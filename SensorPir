@@ -1,0 +1,47 @@
+#include <LiquidCrystal_I2C.h> // Mengimpor library LiquidCrystal_I2C
+LiquidCrystal_I2C lcd(0x27, 16, 2); // Inisialisasi objek lcd dengan alamat 0x27 dan ukuran 16x2
+
+#define pirPin 12 // Deklarasi pin PIR dengan nama variabel pirPin
+int statusPir = LOW; // Deklarasi status PIR awal sebagai LOW
+int gerakanPir; // Deklarasi variabel untuk membaca nilai dari sensor PIR
+int motioncount = 0; // Inisialisasi variabel untuk menghitung gerakan
+
+void setup() {
+  pinMode(pirPin, INPUT); // Mengatur pirPin sebagai input
+  lcd.init(); // Menginisialisasi LCD
+  lcd.backlight(); // Mengaktifkan backlight LCD
+  lcd.setCursor(2,0); // Mengatur kursor pada baris 2 kolom 0
+  lcd.print("PERTEMUAN 3:"); // Menampilkan teks "PERTEMUAN 3:"
+  lcd.setCursor(3,1); // Mengatur kursor pada baris 3 kolom 1
+  lcd.print("Sensor Pir"); // Menampilkan teks "Sensor Pir"
+  Serial.begin(9600); // Memulai komunikasi serial dengan baud rate 9600
+  delay(4000); // Delay selama 4 detik
+}
+
+void loop() {
+  gerakanPir= digitalRead(pirPin); // Membaca nilai dari pin PIR dan menyimpannya dalam variabel gerakanPir
+  if(gerakanPir==HIGH){ // Jika PIR mendeteksi gerakan
+    delay(2000); // Delay selama 2 detik
+    motioncount++; // Menambah nilai motioncount
+    updateLCD(); // Memperbarui tampilan LCD
+
+    Serial.print("Motion Detect = "); // Mencetak pesan "Motion Detect = " ke Serial Monitor
+    Serial.println(motioncount); // Mencetak nilai motioncount ke Serial Monitor
+
+    lcd.backlight(); // Menghidupkan backlight LCD
+    lcd.setCursor(0, 0); // Mengatur kursor pada baris 0 kolom 0
+    lcd.print("Motion Detect = "); // Menampilkan teks "Motion Detect = " di LCD
+    delay(2000); // Delay selama 2 detik
+  }
+  else{
+    Serial.println("No motion detect"); // Mencetak pesan "No motion detect" ke Serial Monitor
+    lcd.clear(); // Membersihkan tampilan LCD
+  }
+  delay(2000); // Delay selama 2 detik
+}
+
+void updateLCD(){
+  lcd.setCursor(0,1); // Mengatur kursor pada baris 0 kolom 1
+  lcd.print("Count = "); // Menampilkan teks "Count = " di LCD
+  lcd.print(motioncount); // Menampilkan nilai motioncount di LCD
+}
